@@ -1,35 +1,50 @@
-import React,{Component} from 'react';
-import ReactDOM from "react-dom";
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { actionCreators } from '../store/DentalSupply';
 
-class DentalSupply extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			items: []			
-		};
-	}
+class DentalSupply extends Component {
+
   componentWillMount() {
-    const url = `api/SampleData/GetItemDetails`;
-	 fetch(url)
-      .then(res => res.json())
-      .then(data => this.setState({items: data}));
+    this.props.actionCreators();
   }
 
   render() {
-	console.log(this.state.items);
-	const items = this.state.items;
-	if(items.Count == 0){
-		return <p>Loading....</p>;	
-	}	
     return (
-	      <div>
-        <ul>
-          {items.map(item =>
-          <li key={item.toothNumber}>Tooth Number: {item.toothNumber} - Ref : {item.itemCode} - Price: {item.price}</li>
-        )}
-        </ul>		
+      <div>
+        <h1>Dental Supply Items forecast</h1>
+        <p>This component demonstrates fetching data from the server and working with URL parameters.</p>
+        {renderForecastsTable(this.props)}       
       </div>
     );
   }
- }
- export default DentalSupply;
+}
+
+function renderForecastsTable(props) {
+  return (
+    <table className='table'>
+      <thead>
+        <tr>
+          <th>Tooth Number</th>
+          <th>SAP Number</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {props.items.map(item =>
+          <tr key={item.itemCode}>
+            <td>{item.toothNumber}</td>
+            <td>{item.itemCode}</td>
+            <td>{item.price}</td>            
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+export default connect(
+  state => state.dentalSupply,
+  dispatch => bindActionCreators(actionCreators, dispatch)
+)(DentalSupply);
